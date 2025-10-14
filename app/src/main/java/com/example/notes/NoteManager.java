@@ -5,12 +5,7 @@ import java.util.List;
 
 public class NoteManager {
     private static NoteManager instance;
-    private List<String> itemList = new ArrayList<>();
-
-    String title;
-    String content;
-    int position;
-
+    private List<NoteObject> itemList = new ArrayList<>();
     private NoteManager(){
     }
     public static NoteManager getInstance(){
@@ -19,11 +14,10 @@ public class NoteManager {
         }
         return instance;
     }
-    public List<String> getItemList(){
+    public List<NoteObject> getItemList(){
         return itemList;
     }
-    public void setItemList(List<String> itemList){
+    public void setItemList(List<NoteObject> itemList){
         this.itemList = itemList;
     }
-
 }
