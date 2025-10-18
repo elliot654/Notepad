@@ -15,58 +15,88 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class NoteActivity extends AppCompatActivity {
+
+    private EditText editTitle;
+    private EditText editText;
+    private TextView detailsText;
+
+    private List<NoteObject> notes;
+    private int position;
+    private long lastSavedTime = 0;
+    private static final long SAVE_COOLDOWN_MS = 5000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
-        List<NoteObject> notes = NoteManager.getInstance().getItemList();
-        //text
-        EditText editTitle = findViewById(R.id.note_title);
-        EditText editText = findViewById(R.id.note_content);
-        TextView detailsText = findViewById(R.id.note_details);
+        notes = NoteManager.getInstance().getItemList();
 
+        editTitle = findViewById(R.id.note_title);
+        editText = findViewById(R.id.note_content);
+        detailsText = findViewById(R.id.note_details);
         Bundle extras = getIntent().getExtras();
-        int position;
         if (extras == null) {
-            position = notes.size(); // new note
+            position = notes.size(); // New note
         } else {
             position = extras.getInt("Source");
-            NoteObject note = notes.get(position);
-            editTitle.setText(note.title);
-            editText.setText(note.content);
-            detailsText.setText("Words : " + note.wordCount);
+            if (position < notes.size()) {
+                NoteObject note = notes.get(position);
+                editTitle.setText(note.title);
+                editText.setText(note.content);
+                detailsText.setText("Words : " + note.wordCount);
+            }
         }
-        //word counter
         editText.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                detailsText.setText("Words : " + s.toString().split("\\s+").length);
+                int wordCount = s.toString().trim().isEmpty() ? 0 : s.toString().trim().split("\\s+").length;
+                detailsText.setText("Words : " + wordCount);
             }
         });
 
-        //save button
         FloatingActionButton saveButton = findViewById(R.id.save_btn);
         saveButton.setOnClickListener(v -> {
-            String title = editTitle.getText().toString();
-            String content = editText.getText().toString();
-            NoteObject newNote = new NoteObject(title, content, content.split("\\s").length, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
-
-            if(notes.isEmpty() || extras==null){
-                notes.add(newNote);
-            }else{
-                notes.set(position, newNote);
-            }
-            //moves to front of list
-            NoteObject updated = notes.remove(position);
-            notes.add(0, updated);
-            //saves data
-            NoteManager.getInstance().setItemList(notes);
-            write(this);
-            //moves back to main activity
+            saveNote();
             Intent myIntent = new Intent(NoteActivity.this, MainActivity.class);
             myIntent.putExtra("Response", editText.getText());
-            this.startActivity(myIntent);
+            startActivity(myIntent);
         });
+    }
+    private void saveNote() {
+        String title = editTitle.getText().toString();
+        String content = editText.getText().toString();
+        int wordCount = content.trim().isEmpty() ? 0 : content.trim().split("\\s+").length;
+
+        NoteObject newNote = new NoteObject(
+                title,
+                content,
+                wordCount,
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+        );
+
+        if (position >= notes.size()) {
+            // New note
+            notes.add(newNote);
+            position = notes.size() - 1;
+        } else {
+            notes.set(position, newNote);
+        }
+        // Move to front
+        NoteObject updated = notes.remove(position);
+        notes.add(0, updated);
+        position = 0;
+        // Save to storage
+        NoteManager.getInstance().setItemList(notes);
+        write(this);
+        lastSavedTime = System.currentTimeMillis();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        long now = System.currentTimeMillis();
+        if (now - lastSavedTime > SAVE_COOLDOWN_MS) {
+            saveNote();
+        }
     }
     public abstract class SimpleTextWatcher implements TextWatcher {
         @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
