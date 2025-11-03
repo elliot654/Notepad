@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1e1e1e"
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
@@ -12,17 +11,15 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="#1e1e1e"
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="NOTES"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
+            android:textSize="28sp"
             android:textStyle="bold"
             android:layout_centerVertical="true"/>
     </RelativeLayout>
@@ -51,7 +48,5 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="#ff2c2c"
-        app:tint="#FFFFFF"/>
+        android:src="@android:drawable/ic_input_add" />
 </RelativeLayout>

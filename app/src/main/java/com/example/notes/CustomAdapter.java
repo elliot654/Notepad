@@ -14,35 +14,34 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.notes.databinding.ListItemBinding;
+
 import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.NoteViewHolder> {
     private Context context;
     private List<NoteObject> values;
-
     public CustomAdapter(Context context) {
         this.context = context;
         this.values = NoteManager.getInstance().getItemList();
     }
-
-    @NonNull
     @Override
-    public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
-        return new NoteViewHolder(view);
+    public NoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        ListItemBinding binding = ListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new NoteViewHolder(binding);
     }
-
     @Override
-    public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
+    public void onBindViewHolder(NoteViewHolder holder, int position) {
         NoteObject note = values.get(position);
 
         if (note.title == null || note.title.isEmpty()) {
-            holder.titleView.setVisibility(View.GONE);
+            holder.binding.noteTitle.setVisibility(View.GONE);
         } else {
-            holder.titleView.setVisibility(View.VISIBLE);
-            holder.titleView.setText(note.title);
+            holder.binding.noteTitle.setVisibility(View.VISIBLE);
+            holder.binding.noteTitle.setText(note.title);
         }
-        holder.noteView.setText(note.content);
+        holder.binding.noteDetail.setText(note.content);
 
         // Click listener for opening note
         holder.itemView.setOnClickListener(v -> {
@@ -57,10 +56,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.NoteViewHo
             builder.setTitle("Delete this note?")
                     .setPositiveButton("Delete", (dialog, which) -> {
                         values.remove(position);
-                        NoteManager.getInstance().setItemList(values);
                         write(context);
-                        notifyDataSetChanged();
                         read(context);
+                        NoteManager.getInstance().setItemList(values);
+                        notifyDataSetChanged();
                         Toast.makeText(context, "Item deleted", Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> Toast.makeText(context, "Delete cancelled", Toast.LENGTH_SHORT).show());
@@ -69,20 +68,16 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.NoteViewHo
             return true; // consume event
         });
     }
-
     @Override
     public int getItemCount() {
         return values.size();
     }
-
     // ViewHolder class
     static class NoteViewHolder extends RecyclerView.ViewHolder {
-        TextView titleView, noteView;
-
-        public NoteViewHolder(@NonNull View itemView) {
-            super(itemView);
-            titleView = itemView.findViewById(R.id.note_title);
-            noteView = itemView.findViewById(R.id.note_detail);
+        final ListItemBinding binding;
+        NoteViewHolder(ListItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }

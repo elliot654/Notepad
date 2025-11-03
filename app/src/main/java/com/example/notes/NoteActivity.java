@@ -19,11 +19,8 @@ public class NoteActivity extends AppCompatActivity {
     private EditText editTitle;
     private EditText editText;
     private TextView detailsText;
-
     private List<NoteObject> notes;
     private int position;
-    private long lastSavedTime = 0;
-    private static final long SAVE_COOLDOWN_MS = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +32,7 @@ public class NoteActivity extends AppCompatActivity {
         editText = findViewById(R.id.note_content);
         detailsText = findViewById(R.id.note_details);
         Bundle extras = getIntent().getExtras();
+
         if (extras == null) {
             position = notes.size(); // New note
         } else {
@@ -46,6 +44,7 @@ public class NoteActivity extends AppCompatActivity {
                 detailsText.setText("Words : " + note.wordCount);
             }
         }
+        //listener for word count
         editText.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -53,13 +52,11 @@ public class NoteActivity extends AppCompatActivity {
                 detailsText.setText("Words : " + wordCount);
             }
         });
-
+        //save button
         FloatingActionButton saveButton = findViewById(R.id.save_btn);
         saveButton.setOnClickListener(v -> {
             saveNote();
-            Intent myIntent = new Intent(NoteActivity.this, MainActivity.class);
-            myIntent.putExtra("Response", editText.getText());
-            startActivity(myIntent);
+            finish();
         });
     }
     private void saveNote() {
@@ -88,15 +85,12 @@ public class NoteActivity extends AppCompatActivity {
         // Save to storage
         NoteManager.getInstance().setItemList(notes);
         write(this);
-        lastSavedTime = System.currentTimeMillis();
     }
+
     @Override
-    protected void onPause() {
+    protected void onPause() { //navigation or close app
         super.onPause();
-        long now = System.currentTimeMillis();
-        if (now - lastSavedTime > SAVE_COOLDOWN_MS) {
             saveNote();
-        }
     }
     public abstract class SimpleTextWatcher implements TextWatcher {
         @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
