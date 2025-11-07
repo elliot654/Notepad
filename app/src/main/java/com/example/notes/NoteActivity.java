@@ -62,6 +62,9 @@ public class NoteActivity extends AppCompatActivity {
     private void saveNote() {
         String title = editTitle.getText().toString();
         String content = editText.getText().toString();
+        if(content.isEmpty()){
+            return;
+        }
         int wordCount = content.trim().isEmpty() ? 0 : content.trim().split("\\s+").length;
 
         NoteObject newNote = new NoteObject(
