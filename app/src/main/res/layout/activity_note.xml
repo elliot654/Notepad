@@ -18,20 +18,31 @@
         android:textSize="24sp"
         android:layout_margin="16dp"/>
 
-    <EditText
-        android:id="@+id/note_content"
+    <ScrollView
+        android:id="@+id/note_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/note_title"
-        android:layout_above="@+id/save_btn"
-        android:hint="Start writing..."
-        android:background="@drawable/rounded_corners"
-        android:gravity="top|start"
-        android:inputType="textMultiLine"
+        android:layout_above="@id/save_btn"
         android:layout_margin="16dp"
-        android:padding="12dp"
-        android:overScrollMode="always"
-        android:scrollbars="vertical" />
+        android:background="@drawable/rounded_corners"
+        android:fillViewport="true"
+        android:clipToPadding="true"
+        android:scrollbars="vertical"
+        android:overScrollMode="ifContentScrolls">
+
+        <EditText
+            android:id="@+id/note_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Start writing..."
+            android:background="@android:color/transparent"
+            android:gravity="top|start"
+            android:inputType="textMultiLine"
+            android:padding="12dp"
+            android:scrollbars="none" />
+
+    </ScrollView>
 
     <TextView
         android:id="@+id/note_details"
