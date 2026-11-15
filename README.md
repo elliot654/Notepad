@@ -37,6 +37,8 @@ ex. Elliot Sheehy
 
 ## Version History
 
+* 0.6
+    * scrolling behaviour in note view fixed
 * 0.5
     * bugfixes (no empty notes, preview and content pointers desyncing)
 * 0.4
